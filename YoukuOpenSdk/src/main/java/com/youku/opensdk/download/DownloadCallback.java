@@ -11,6 +11,6 @@ public interface DownloadCallback {
 
     void onPostDownload();
 
-    void onFailed();
+    void onFailed(Exception e);
 
 }

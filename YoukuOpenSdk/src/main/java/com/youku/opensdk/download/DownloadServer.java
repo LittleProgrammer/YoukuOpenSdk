@@ -15,7 +15,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by smy on 2016/3/31.
@@ -25,18 +30,12 @@ public class DownloadServer {
     private static DownloadServer sServer;
 
     private final Context mContext;
-    private DownloadCallback mDownloadCallback;
 
-    private String mUrl;
-    private String mAppName;
-
-    private Queue<DownloadTask> mQueue = new LinkedList<>();
-    private DownloadThread mDownloadThread;
-
-    private final int TIMEOUT = 6 * 1000;
+    private ExecutorService mExecutorService;
 
     private DownloadServer(Context context) {
         mContext = context;
+        mExecutorService = Executors.newSingleThreadExecutor();
     }
 
     public static synchronized DownloadServer getInstance(Context context) {
@@ -55,39 +54,13 @@ public class DownloadServer {
             Logger.d("appName is empty !");
             return;
         }
-        mDownloadCallback = callback;
-        mUrl = url;
-        mAppName = appName;
+        DownloadTask task = new DownloadTask(mContext, url, appName, callback);
+        mExecutorService.execute(task);
     }
 
-    private class DownloadThread extends Thread {
-
-        private final String mUrl;
-        private final String mFileName;
-
-        public DownloadThread(String url, String fileName) {
-            mUrl = url;
-            mFileName = fileName;
-        }
-
-        @Override
-        public void run() {
-            FileInputStream fis = null;
-            try {
-                URL url = new URL(mUrl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(TIMEOUT);
-                conn.setReadTimeout(TIMEOUT);
-                InputStream is = conn.getInputStream();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-
-            }
-        }
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        mExecutorService.shutdown();
     }
-
-
 }

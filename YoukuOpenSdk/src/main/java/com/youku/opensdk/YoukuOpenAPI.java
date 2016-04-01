@@ -3,6 +3,8 @@ package com.youku.opensdk;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.youku.opensdk.download.DownloadCallback;
+
 /**
  * Created by smy on 2016/3/30.
  */
@@ -24,16 +26,8 @@ public interface YoukuOpenAPI {
     int getVersion();
 
     /**
-     * 获取优酷App下载地址
-     * */
-    String getYoukuAppDownloadUrl();
-
-    /**
      * 第三方应用需要传递一些参数加入params里（key, value）形式，如下：
-     * caller_package_name      第三方应用报名(String,必须)
      * result_action            回调第三方应用时的anction(String,必须)
-     * caller_app_name          第三方应用名字(String,必须)
-     * sdk_version              使用opensdk的版本(int,必须)
      * file_path                视频文件绝对路径(String, 必须 现阶段支持file:// ,content:// 协议文件路径)
      * title                    视频标题(String,必须)
      * description              视频说明(String,必须)
@@ -41,5 +35,10 @@ public interface YoukuOpenAPI {
      */
     boolean share(Context context, Bundle params);
 
-    void downloadYoukuApp();
+    /**
+     * 获取优酷App下载地址
+     * */
+    String getYoukuAppDownloadUrl();
+
+    void downloadYoukuApp(DownloadCallback callback);
 }

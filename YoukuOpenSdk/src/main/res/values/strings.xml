@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">YoukuOpenSdk</string>
-    <string name="has_not_youku_app">请先安装优酷App，才可以分享哦！</string>
 </resources>
