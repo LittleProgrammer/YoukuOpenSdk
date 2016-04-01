@@ -11,6 +11,9 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * Created by smy on 2016/3/31.
@@ -74,4 +77,21 @@ public class Utils {
         return true;
     }
 
+    public static String urlEncode(String str) {
+        try {
+            return URLEncoder.encode(str, Constants.CHARSET);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String urlDecode(String str) {
+        try {
+            return URLDecoder.decode(str, Constants.CHARSET);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 }

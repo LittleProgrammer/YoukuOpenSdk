@@ -10,6 +10,8 @@ import com.youku.opensdk.download.DownloadCallback;
  */
 public interface YoukuOpenAPI {
 
+    void authorize(String appKey, String secretKey, YoukuAPIAuthCallback callback);
+
     /**
      * 判断是否安装YoukuApp
      * */

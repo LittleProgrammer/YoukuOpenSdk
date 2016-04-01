@@ -11,7 +11,7 @@ import com.youku.opensdk.YoukuOpenAPI;
 public class ApiFirstFactory extends YoukuAPIFactory {
 
     @Override
-    protected YoukuOpenAPI createApiInstance(Context context, String appKey) {
-        return new ApiFirstVersion(context, appKey);
+    protected YoukuOpenAPI createApiInstance(Context context) {
+        return new ApiFirstVersion(context);
     }
 }

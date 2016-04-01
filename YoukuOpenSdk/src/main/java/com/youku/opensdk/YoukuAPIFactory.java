@@ -16,11 +16,11 @@ public abstract class YoukuAPIFactory {
 
     }
 
-    public static YoukuOpenAPI createYoukuApi(Context context, String appKey) {
+    public static YoukuOpenAPI createYoukuApi(Context context) {
         if (null == sYoukuApiFactory) {
             sYoukuApiFactory = createYoukuApiFactory();
         }
-        return sYoukuApiFactory.createApiInstance(context, appKey);
+        return sYoukuApiFactory.createApiInstance(context);
     }
 
     private static YoukuAPIFactory createYoukuApiFactory() {
@@ -33,5 +33,5 @@ public abstract class YoukuAPIFactory {
         return sYoukuApiFactory;
     }
 
-    protected abstract YoukuOpenAPI createApiInstance(Context context, String appKey);
+    protected abstract YoukuOpenAPI createApiInstance(Context context);
 }

@@ -9,15 +9,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.youku.opensdk.YoukuAPIAuthCallback;
 import com.youku.opensdk.YoukuOpenAPI;
 import com.youku.opensdk.download.DownloadCallback;
 import com.youku.opensdk.download.DownloadServer;
 import com.youku.opensdk.util.Constants;
+import com.youku.opensdk.util.HttpUtils;
 import com.youku.opensdk.util.Logger;
+import com.youku.opensdk.util.SignalUtils;
 import com.youku.opensdk.util.Utils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by smy on 2016/3/30.
@@ -29,9 +35,53 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     private int mYoukuAppVersion;
     private int mYoukuOpenApiVersion;
 
-    ApiFirstVersion(Context context, String appKey) {
+    ApiFirstVersion(Context context) {
         mContext = context;
         queryYoukuApp(mContext);
+    }
+
+    @Override
+    public void authorize(final String appKey, final String secretKey, final YoukuAPIAuthCallback callback) {
+        new Thread() {
+            @Override
+            public void run() {
+                long curTime = System.currentTimeMillis() / 1000;
+                Map<String, String> map = new HashMap<String, String>();
+                String uri = Utils.urlEncode(HttpUtils.URI_GET_APP_AUTHORIZE);
+                String appK = Utils.urlEncode(appKey);
+                map.put("action", uri);
+                map.put("client_id", appK);
+                map.put("timestamp", curTime + "");
+                map.put("version", "3.0");
+                map.put("clientid", appK);
+                String signal = SignalUtils.signal(map, secretKey);
+                map.clear();
+                JSONObject obj = new JSONObject();
+                try {
+                    obj.put("action", uri);
+                    obj.put("client_id", appK);
+                    obj.put("timestamp", curTime + "");
+                    obj.put("version", "3.0");
+                    obj.put("sign", signal);
+                    map.put("opensysparams", obj.toString());
+                    map.put("clientid", appK);
+                    String result = HttpUtils.post(HttpUtils.OPEN_API_REST_JSON, map);
+                    if (null == callback) return;
+                    JSONObject json = new JSONObject(result);
+                    int resultCode = json.optJSONObject("e").optInt("code");
+                    if (resultCode == 0) {
+                        callback.success(result);
+                    } else {
+                        callback.failed(result);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    if(null != callback) {
+                        callback.failed(e.getMessage());
+                    }
+                }
+            }
+        }.start();
     }
 
     @Override

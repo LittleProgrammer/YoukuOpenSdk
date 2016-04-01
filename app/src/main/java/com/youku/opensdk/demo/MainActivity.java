@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.youku.opensdk.YoukuAPIAuthCallback;
 import com.youku.opensdk.YoukuAPIFactory;
 import com.youku.opensdk.YoukuOpenAPI;
 import com.youku.opensdk.download.DownloadCallback;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final YoukuOpenAPI yk = YoukuAPIFactory.createYoukuApi(this, "");
+        final YoukuOpenAPI yk = YoukuAPIFactory.createYoukuApi(this);
         final Bundle bundle = new Bundle();
         /*
          * 第三方应用需要传递一些参数加入params里（key, value）形式，如下：
@@ -48,32 +49,44 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                if (yk.hasYoukuApp()) {
-                    /*  调用分享接口  */
-                    yk.share(MainActivity.this, bundle);
-                } else {
-                    yk.downloadYoukuApp(new DownloadCallback() {
-                        @Override
-                        public void onPreDownload() {
+                yk.authorize("123456", "123456", new YoukuAPIAuthCallback() {
+                    @Override
+                    public void success(String result) {
 
-                        }
+                    }
 
-                        @Override
-                        public void doDownloading(int progress) {
-                            Log.d(TAG, "download youku app progress = " + progress);
-                        }
+                    @Override
+                    public void failed(String result) {
 
-                        @Override
-                        public void onPostDownload() {
+                    }
+                });
 
-                        }
-
-                        @Override
-                        public void onFailed(Exception e) {
-
-                        }
-                    });
-                }
+//                if (yk.hasYoukuApp()) {
+//                    /*  调用分享接口  */
+//                    yk.share(MainActivity.this, bundle);
+//                } else {
+//                    yk.downloadYoukuApp(new DownloadCallback() {
+//                        @Override
+//                        public void onPreDownload() {
+//
+//                        }
+//
+//                        @Override
+//                        public void doDownloading(int progress) {
+//                            Log.d(TAG, "download youku app progress = " + progress);
+//                        }
+//
+//                        @Override
+//                        public void onPostDownload() {
+//
+//                        }
+//
+//                        @Override
+//                        public void onFailed(Exception e) {
+//
+//                        }
+//                    });
+//                }
             }
         });
     }
