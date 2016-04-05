@@ -1,10 +1,9 @@
 package com.youku.opensdk.demo;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,18 +12,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.youku.opensdk.YoukuAPIAuthCallback;
 import com.youku.opensdk.YoukuAPIFactory;
 import com.youku.opensdk.YoukuOpenAPI;
 import com.youku.opensdk.download.DownloadCallback;
-import com.youku.opensdk.util.Logger;
-import com.youku.opensdk.util.Utils;
-
-import java.io.File;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private final String TAG = "YoukuOpenSdkDemo";
     private YoukuOpenAPI mYoukuOpenAPI;
@@ -33,37 +29,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        findViewById(R.id.auth).setOnClickListener(this);
+        findViewById(R.id.share).setOnClickListener(this);
+
+        // 创建YoukuOpenAPI实例
         mYoukuOpenAPI = YoukuAPIFactory.createYoukuApi(this);
+    }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+    //授权接口
+    private void auth() {
+        mYoukuOpenAPI.authorize(Constants.TEST_APPKEY, Constants.TEST_SECRET, new YoukuAPIAuthCallback() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void success() {
+                Log.d(TAG, "auth success !!!");
+                showText("获取授权成功！");
+            }
 
-//                Utils.installApplication(MainActivity.this, "/mnt/sdcard/Download/youku.apk");
-
-                mYoukuOpenAPI.authorize(Constants.TEST_APPKEY, Constants.TEST_SECRET, new YoukuAPIAuthCallback() {
-                    @Override
-                    public void success() {
-                        Log.d(TAG, "auth success !!!");
-                        share();
-                    }
-
-                    @Override
-                    public void failed() {
-                        Log.d(TAG, "auth failed !!!");
-                    }
-                });
+            @Override
+            public void failed() {
+                Log.d(TAG, "auth failed !!!");
+                showText("获取授权失败！");
             }
         });
     }
 
     // 调用分享接口
-    public void share() {
+    private void share() {
         final Bundle bundle = new Bundle();
         /*
          * 第三方应用需要传递一些参数加入params里（key, value）形式，如下：
@@ -82,73 +73,52 @@ public class MainActivity extends AppCompatActivity {
                     /*  调用分享接口  */
             mYoukuOpenAPI.share(MainActivity.this, bundle);
         } else {
-            mYoukuOpenAPI.downloadYoukuApp(new DownloadCallback() {
-                @Override
-                public void onPreDownload() {
-
-                }
-
-                @Override
-                public void doDownloading(int progress) {
-                    Log.d(TAG, "download youku app progress = " + progress);
-                }
-
-                @Override
-                public void onPostDownload() {
-
-                }
-
-                @Override
-                public void onFailed(Exception e) {
-
-                }
-            });
+            downloadYoukuApp();
         }
     }
 
-//    private void registerReceiver() {
-//        IntentFilter filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
-//        filter.addDataScheme("package");
-//        registerReceiver(mReceiver, filter);
-//    }
+    private void downloadYoukuApp() {
+        mYoukuOpenAPI.downloadYoukuApp(new DownloadCallback() {
+            @Override
+            public void onPreDownload() {
 
-//    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            String data = intent.getDataString();
-//            Logger.d("receiver action = " + intent.getAction() + ", data = " + data);
-//            String packageName = data.substring(8);
-//            if (null != packageName && packageName.contains("youku")) {
-//                Utils.startAppFromPackage(MainActivity.this, packageName);
-//            }
-//        }
-//    };
+            }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+            @Override
+            public void doDownloading(int progress) {
+                Log.d(TAG, "download youku app progress = " + progress);
+            }
+
+            @Override
+            public void onPostDownload() {
+                showText("下载成功！");
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                showText("下载失败，请检查后重试！");
+            }
+        });
+    }
+
+    private void showText(final String text) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.auth:
+                auth();
+                break;
+            case R.id.share:
+                share();
+                break;
         }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        unregisterReceiver(mReceiver);
     }
 }

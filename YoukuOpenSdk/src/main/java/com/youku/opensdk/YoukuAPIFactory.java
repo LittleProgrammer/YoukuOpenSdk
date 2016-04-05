@@ -12,6 +12,7 @@ import com.youku.opensdk.util.Logger;
 public abstract class YoukuAPIFactory {
 
     private static YoukuAPIFactory sYoukuApiFactory;
+    private static YoukuOpenAPI sYoukuOpenAPI;
 
     protected YoukuAPIFactory() {
 
@@ -21,10 +22,14 @@ public abstract class YoukuAPIFactory {
         if (null == context) {
             throw new NullPointerException("createYoukuApi context is null !!!");
         }
+        if (null != sYoukuOpenAPI) {
+            return sYoukuOpenAPI;
+        }
         if (null == sYoukuApiFactory) {
             sYoukuApiFactory = createYoukuApiFactory();
         }
-        return sYoukuApiFactory.createApiInstance(context.getApplicationContext());
+        sYoukuOpenAPI = sYoukuApiFactory.createApiInstance(context.getApplicationContext());
+        return sYoukuOpenAPI;
     }
 
     private static YoukuAPIFactory createYoukuApiFactory() {
