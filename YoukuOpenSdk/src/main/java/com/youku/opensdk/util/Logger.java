@@ -13,7 +13,7 @@ public class Logger {
 
     public static final String TAG = "YoukuOpenSdk";
 
-    private static boolean sDebug = true;
+    private static boolean sDebug = false;
 
     public static void setDebugEnabled(boolean debug) {
         sDebug = debug;

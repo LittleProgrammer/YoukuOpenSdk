@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.youku.opensdk.impl.first.ApiFirstFactory;
 import com.youku.opensdk.util.Constants;
+import com.youku.opensdk.util.Logger;
 
 /**
  * Created by smy on 2016/3/30.
@@ -17,10 +18,13 @@ public abstract class YoukuAPIFactory {
     }
 
     public static YoukuOpenAPI createYoukuApi(Context context) {
+        if (null == context) {
+            throw new NullPointerException("createYoukuApi context is null !!!");
+        }
         if (null == sYoukuApiFactory) {
             sYoukuApiFactory = createYoukuApiFactory();
         }
-        return sYoukuApiFactory.createApiInstance(context);
+        return sYoukuApiFactory.createApiInstance(context.getApplicationContext());
     }
 
     private static YoukuAPIFactory createYoukuApiFactory() {

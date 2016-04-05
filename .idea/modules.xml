@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Demo/Demo.iml" filepath="$PROJECT_DIR$/Demo/Demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/YoukuOpenSdk.iml" filepath="$PROJECT_DIR$/YoukuOpenSdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/YoukuOpenSdk/YoukuOpenSdk-YoukuOpenSdk.iml" filepath="$PROJECT_DIR$/YoukuOpenSdk/YoukuOpenSdk-YoukuOpenSdk.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
 </project>

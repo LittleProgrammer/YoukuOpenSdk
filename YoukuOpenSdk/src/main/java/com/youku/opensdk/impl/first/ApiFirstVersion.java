@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import com.youku.opensdk.YoukuAPIAuthCallback;
@@ -19,11 +21,13 @@ import com.youku.opensdk.util.Logger;
 import com.youku.opensdk.util.SignalUtils;
 import com.youku.opensdk.util.Utils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Created by smy on 2016/3/30.
@@ -35,6 +39,8 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     private int mYoukuAppVersion;
     private int mYoukuOpenApiVersion;
 
+    private boolean mShareEnabled;
+
     ApiFirstVersion(Context context) {
         mContext = context;
         queryYoukuApp(mContext);
@@ -42,45 +48,52 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
     @Override
     public void authorize(final String appKey, final String secretKey, final YoukuAPIAuthCallback callback) {
+        if (TextUtils.isEmpty(appKey)) return;
+        if (TextUtils.isEmpty(secretKey)) return;
+        if (null == callback) return;
         new Thread() {
             @Override
             public void run() {
                 long curTime = System.currentTimeMillis() / 1000;
-                Map<String, String> map = new HashMap<String, String>();
-                String uri = Utils.urlEncode(HttpUtils.URI_GET_APP_AUTHORIZE);
-                String appK = Utils.urlEncode(appKey);
+                SortedMap<String, String> map = new TreeMap<>();
+                String uri = HttpUtils.URI_GET_APP_AUTHORIZE;
                 map.put("action", uri);
-                map.put("client_id", appK);
+                map.put("client_id", appKey);
                 map.put("timestamp", curTime + "");
                 map.put("version", "3.0");
-                map.put("clientid", appK);
-                String signal = SignalUtils.signal(map, secretKey);
-                map.clear();
-                JSONObject obj = new JSONObject();
+                map.put("clientid", appKey);
                 try {
-                    obj.put("action", uri);
-                    obj.put("client_id", appK);
-                    obj.put("timestamp", curTime + "");
-                    obj.put("version", "3.0");
-                    obj.put("sign", signal);
-                    map.put("opensysparams", obj.toString());
-                    map.put("clientid", appK);
-                    String result = HttpUtils.post(HttpUtils.OPEN_API_REST_JSON, map);
-                    if (null == callback) return;
-                    JSONObject json = new JSONObject(result);
-                    int resultCode = json.optJSONObject("e").optInt("code");
-                    if (resultCode == 0) {
-                        callback.success(result);
-                    } else {
-                        callback.failed(result);
+                    JSONObject json = SignalUtils.signal(map, secretKey);
+                    String url = HttpUtils.OPEN_API_REST_JSON + "?" + "opensysparams=" +
+                            Utils.urlEncode(json.toString()) + "&clientid=" + appKey;
+                    String result = HttpUtils.get(url);
+                    if (TextUtils.isEmpty(result)) {
+                        mShareEnabled = false;
+                        callback.failed();
+                        return;
+                    }
+                    JSONObject resJson = new JSONObject(result);
+                    JSONArray array = resJson.optJSONArray("rtn_data");
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject obj = array.optJSONObject(i);
+                        String authCode = obj.optString("gid");
+                        if (Constants.OPEN_SDK_SHARE_CODE.equals(authCode)) {
+                            mShareEnabled = true;
+                            callback.success();
+                            return;
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    if(null != callback) {
-                        callback.failed(e.getMessage());
-                    }
+                    mShareEnabled = false;
+                    callback.failed();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    mShareEnabled = false;
+                    callback.failed();
                 }
             }
+
         }.start();
     }
 
@@ -113,6 +126,10 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
     @Override
     public boolean share(Context context, Bundle params) {
+        if (!mShareEnabled) {
+            Logger.d("before share you must auth your app !");
+            return false;
+        }
         if (!hasYoukuApp()) {
             Logger.d("haven`t install youku app !");
             return false;
@@ -166,8 +183,6 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     @Override
     public void downloadYoukuApp(final DownloadCallback callback) {
         DownloadServer server = DownloadServer.getInstance(mContext);
-        IntentFilter filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
-        mContext.registerReceiver(mReceiver, filter);
         server.download(Constants.YOUKU_APP_DOWNLOAD_URL, "youku.apk", new DownloadCallback() {
             @Override
             public void onPreDownload() {
@@ -185,7 +200,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
             @Override
             public void onPostDownload() {
-                mContext.unregisterReceiver(mReceiver);
+                registerReceiver();
                 if (null != callback) {
                     callback.onPostDownload();
                 }
@@ -199,6 +214,13 @@ public class ApiFirstVersion implements YoukuOpenAPI {
                 }
             }
         });
+    }
+
+    public void registerReceiver() {
+        Logger.d("register receiver !!!");
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
+        filter.addDataScheme("package");
+        mContext.registerReceiver(mReceiver, filter);
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -216,6 +238,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
+        Logger.d("ApiFirstVersion is finalized !!!");
         mContext.unregisterReceiver(mReceiver);
     }
 }
