@@ -247,7 +247,6 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
             @Override
             public void onFailed(Exception e) {
-                mContext.unregisterReceiver(mReceiver);
                 if (null != callback) {
                     callback.onFailed(e);
                 }
@@ -270,6 +269,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
             String packageName = data.substring(8);
             if (null != packageName && packageName.contains("youku")) {
                 Utils.startAppFromPackage(mContext, packageName);
+                mContext.unregisterReceiver(mReceiver);
             }
         }
     };
@@ -278,6 +278,5 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     protected void finalize() throws Throwable {
         super.finalize();
         Logger.d("ApiFirstVersion is finalized !!!");
-        mContext.unregisterReceiver(mReceiver);
     }
 }
