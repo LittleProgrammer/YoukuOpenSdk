@@ -1,5 +1,6 @@
 package com.youku.opensdk.impl.first;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -130,6 +131,9 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
     @Override
     public boolean share(Context context, Bundle params) {
+        if (null == context) {
+            return false;
+        }
         if (!mShareEnabled) {
             Logger.d("before share you must auth your app !");
             return false;
@@ -142,14 +146,52 @@ public class ApiFirstVersion implements YoukuOpenAPI {
             Logger.d("youku app doesn`t support share api !");
             return false;
         }
-        if (null == context) {
-            Logger.d("context is null !");
+        if (null == params || params.size() <= 0) {
+            Logger.d("params is empty !");
+            return false;
+        }
+        buildParams(params);
+        Intent intent = new Intent();
+        intent.setAction(Constants.OPEN_API_ACTION_UPLOAD);
+        intent.setPackage(mYoukuPackageName);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtras(params);
+        mContext.startActivity(intent);
+        return true;
+    }
+
+    @Override
+    public boolean share(Activity a, int requestCode, Bundle params) {
+        if (null == a) {
+            return false;
+        }
+        if (!mShareEnabled) {
+            Logger.d("before share you must auth your app !");
+            return false;
+        }
+        if (!hasYoukuApp()) {
+            Logger.d("haven`t install youku app !");
+            return false;
+        }
+        if (!isSupportShare()) {
+            Logger.d("youku app doesn`t support share api !");
             return false;
         }
         if (null == params || params.size() <= 0) {
             Logger.d("params is empty !");
             return false;
         }
+        buildParams(params);
+        Intent intent = new Intent();
+        intent.setAction(Constants.OPEN_API_ACTION_UPLOAD);
+        intent.setPackage(mYoukuPackageName);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtras(params);
+        a.startActivityForResult(intent, requestCode);
+        return true;
+    }
+
+    private void buildParams(Bundle params) {
         if (!params.containsKey("sdk_version")) {
             params.putInt("sdk_version", Constants.OPEN_SDK_VERSION);
         }
@@ -159,13 +201,6 @@ public class ApiFirstVersion implements YoukuOpenAPI {
         if (!params.containsKey("caller_app_name")) {
             params.putString("caller_app_name", Utils.getAppName(mContext));
         }
-        Intent intent = new Intent();
-        intent.setAction(Constants.OPEN_API_ACTION_UPLOAD);
-        intent.setPackage(mYoukuPackageName);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtras(params);
-        mContext.startActivity(intent);
-        return true;
     }
 
     private void queryYoukuApp(Context context) {

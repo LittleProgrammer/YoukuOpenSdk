@@ -1,5 +1,6 @@
 package com.youku.opensdk;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -37,6 +38,14 @@ public interface YoukuOpenAPI {
      */
     boolean share(Context context, Bundle params);
 
+    /**
+     * 功能同上
+     * @param a 需要分享的Activity
+     * @param requestCode 基于startActivityForResult的requestCode
+     * @param params 同上，只是不必添加result_action参数
+     * @return 是否成功
+     */
+    boolean share(Activity a,  int requestCode, Bundle params);
     /**
      * 获取优酷App下载地址
      * */

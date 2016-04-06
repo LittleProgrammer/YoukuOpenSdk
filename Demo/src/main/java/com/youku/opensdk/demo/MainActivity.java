@@ -1,6 +1,7 @@
 package com.youku.opensdk.demo;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -24,6 +25,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private final String TAG = "YoukuOpenSdkDemo";
     private YoukuOpenAPI mYoukuOpenAPI;
+    private final int REQUEST_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         findViewById(R.id.auth).setOnClickListener(this);
         findViewById(R.id.share).setOnClickListener(this);
+        findViewById(R.id.download).setOnClickListener(this);
 
         // 创建YoukuOpenAPI实例
         mYoukuOpenAPI = YoukuAPIFactory.createYoukuApi(this);
@@ -70,10 +73,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         bundle.putString("description", "优酷上传测试");
         bundle.putString("topicName", "优酷上传测试");
         if (mYoukuOpenAPI.hasYoukuApp()) {
-                    /*  调用分享接口  */
+
+            /*  两种分享接口调用方式  */
             mYoukuOpenAPI.share(MainActivity.this, bundle);
-        } else {
-            downloadYoukuApp();
+
+            /* 基于startActivityForResult的方法，所以需要传递activity，并且参数bundle
+            *  中不再需要加入result_action，并需要该activity重写onActivityResult方法*/
+            mYoukuOpenAPI.share(MainActivity.this, REQUEST_CODE, bundle);
         }
     }
 
@@ -119,6 +125,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.share:
                 share();
                 break;
+            case R.id.download:
+                downloadYoukuApp();
+                break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
