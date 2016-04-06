@@ -48,6 +48,9 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
     @Override
     public void authorize(final String appKey, final String secretKey, final YoukuAPIAuthCallback callback) {
+        if (!hasYoukuApp()) {
+            return;
+        }
         if (TextUtils.isEmpty(appKey)) return;
         if (TextUtils.isEmpty(secretKey)) return;
         if (null == callback) return;
@@ -99,6 +102,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
     @Override
     public boolean hasYoukuApp() {
+        queryYoukuApp(mContext);
         if (mYoukuAppVersion < 0 || TextUtils.isEmpty(mYoukuPackageName)) {
             return false;
         }
