@@ -12,6 +12,15 @@
         android:layout_marginTop="10dp"
         android:text="获取分享权限" />
 
+    <EditText
+        android:id="@+id/video_address_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:hint="请输入视频文件地址"
+        android:textColor="@android:color/black" />
+
     <Button
         android:id="@+id/share"
         android:layout_width="match_parent"
@@ -22,5 +31,6 @@
         android:id="@+id/download"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="下载YoukApp" />
 </LinearLayout>
