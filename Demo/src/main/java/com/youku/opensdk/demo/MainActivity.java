@@ -88,11 +88,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (mYoukuOpenAPI.hasYoukuApp()) {
 
             /*  两种分享接口调用方式  */
-            mYoukuOpenAPI.share(MainActivity.this, bundle);
-
+            /*
+            if (!mYoukuOpenAPI.share(MainActivity.this, bundle)) {
+                showText("请先获取授权！");
+            }
+            */
             /* 基于startActivityForResult的方法，所以需要传递activity，并且参数bundle
             *  中不再需要加入result_action，并需要该activity重写onActivityResult方法*/
-            mYoukuOpenAPI.share(MainActivity.this, REQUEST_CODE, bundle);
+            if (!mYoukuOpenAPI.share(MainActivity.this, REQUEST_CODE, bundle)) {
+                showText("请先获取授权！");
+            }
         }
     }
 
@@ -147,5 +152,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CODE:
+                if (RESULT_OK == resultCode) {
+                    Log.d("RESULT_OK", "test open sdk intent = " + data.toString());
+                }
+                break;
+        }
     }
 }
