@@ -188,7 +188,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
         Intent intent = new Intent();
         intent.setAction(Constants.OPEN_API_ACTION_UPLOAD);
         intent.setPackage(mYoukuPackageName);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtras(params);
         a.startActivityForResult(intent, requestCode);
         return true;

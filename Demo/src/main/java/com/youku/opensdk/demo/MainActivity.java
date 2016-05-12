@@ -67,10 +67,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     // 调用分享接口
     private void share() {
         String videoAddr = mVideoAddressView.getText().toString();
-        if (TextUtils.isEmpty(videoAddr)) {
-            showText("请输入视频文件地址。。。");
-            return;
-        }
+        videoAddr = "file:///mnt/sdcard/Download/720p.mp4";
+//        if (TextUtils.isEmpty(videoAddr)) {
+//            showText("请输入视频文件地址。。。");
+//            return;
+//        }
         final Bundle bundle = new Bundle();
         /*
          * 第三方应用需要传递一些参数加入params里（key, value）形式，如下：
@@ -154,9 +155,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_CODE:
-                if (RESULT_OK == resultCode) {
-                    Log.d("RESULT_OK", "test open sdk intent = " + data.toString());
-                }
+                Log.d("TestOpenSdk", "resultCode = " + resultCode + "\ntest open sdk intent = " + data);
                 break;
         }
     }
