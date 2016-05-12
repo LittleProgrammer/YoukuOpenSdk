@@ -44,6 +44,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
     ApiFirstVersion(Context context) {
         mContext = context;
+        queryYoukuAppFromPM(mContext);
         queryYoukuApp(mContext);
     }
 
@@ -104,7 +105,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     @Override
     public boolean hasYoukuApp() {
         queryYoukuApp(mContext);
-        if (mYoukuAppVersion <= 1 || TextUtils.isEmpty(mYoukuPackageName)) {
+        if (mYoukuAppVersion < 0 || TextUtils.isEmpty(mYoukuPackageName)) {
             return false;
         }
         return true;
@@ -217,6 +218,10 @@ public class ApiFirstVersion implements YoukuOpenAPI {
         }
         if (null != c && !c.isClosed())
             c.close();
+    }
+
+    private boolean queryYoukuAppFromPM(Context context) {
+        return Utils.isPackageExist(context, Constants.YOUKU_APP_PACKAGE);
     }
 
     @Override

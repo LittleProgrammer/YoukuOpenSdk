@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * Created by smy on 2016/3/31.
@@ -56,6 +57,20 @@ public class Utils {
         return "";
     }
 
+    public static boolean isPackageExist(Context context, String packageName) {
+        if (TextUtils.isEmpty(packageName))
+            return false;
+        PackageManager pm = context.getPackageManager();
+        List<PackageInfo> list = pm.getInstalledPackages(0);
+        for (PackageInfo info : list) {
+            String pName = info.packageName;
+            if (packageName.equals(pName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void installApplication(Context context, String absolutePath) {
         File f = new File(absolutePath);
         if (!f.exists())
@@ -94,4 +109,5 @@ public class Utils {
         }
         return "";
     }
+
 }

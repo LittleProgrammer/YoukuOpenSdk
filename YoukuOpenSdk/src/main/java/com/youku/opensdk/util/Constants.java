@@ -11,5 +11,5 @@ public class Constants {
     public static final String OPEN_SDK_SHARE_CODE = "5684faf3e4b0fc7539d66a19";
     public static final String OPEN_API_ACTION_UPLOAD = "com.youku.intent.action.UPLOAD";
     public static final String YOUKU_APP_DOWNLOAD_URL = "http://dl.m.cc.youku.com/android/phone/Youku_Android_pcdaoliu.apk";
-
+    public static final String YOUKU_APP_PACKAGE = "com.youku.phone";
 }
