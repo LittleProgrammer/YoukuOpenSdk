@@ -44,7 +44,9 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
     ApiFirstVersion(Context context) {
         mContext = context;
-        queryYoukuAppFromPM(mContext);
+        if (queryYoukuAppFromPM(mContext)) {
+            startYoukuEmptyActivity(mContext);
+        }
         queryYoukuApp(mContext);
     }
 
@@ -221,7 +223,15 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     }
 
     private boolean queryYoukuAppFromPM(Context context) {
+
         return Utils.isPackageExist(context, Constants.YOUKU_APP_PACKAGE);
+    }
+
+    private void startYoukuEmptyActivity(Context context) {
+        Intent intent = new Intent();
+        intent.setClassName("com.youku.phone", "com.youku.service.push.EmptyActivity");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     @Override
