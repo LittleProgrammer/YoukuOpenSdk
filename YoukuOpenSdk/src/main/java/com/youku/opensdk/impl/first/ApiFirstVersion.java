@@ -104,7 +104,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     @Override
     public boolean hasYoukuApp() {
         queryYoukuApp(mContext);
-        if (mYoukuAppVersion < 0 || TextUtils.isEmpty(mYoukuPackageName)) {
+        if (mYoukuAppVersion <= 1 || TextUtils.isEmpty(mYoukuPackageName)) {
             return false;
         }
         return true;
@@ -112,7 +112,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
 
     @Override
     public boolean isSupportShare() {
-        if (mYoukuOpenApiVersion > 0) {
+        if (mYoukuOpenApiVersion > 1) {
             return true;
         }
         return false;
