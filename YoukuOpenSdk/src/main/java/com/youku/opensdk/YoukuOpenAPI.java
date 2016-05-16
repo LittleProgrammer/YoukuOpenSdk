@@ -36,7 +36,8 @@ public interface YoukuOpenAPI {
      * description              视频说明(String,必须)
      * topicName                带的话题(String,非必须)
      */
-    boolean share(Context context, Bundle params);
+    boolean
+    share(Context context, Bundle params);
 
     /**
      * 功能同上

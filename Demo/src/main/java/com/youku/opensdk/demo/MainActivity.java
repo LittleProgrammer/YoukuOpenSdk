@@ -77,8 +77,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
          * 第三方应用需要传递一些参数加入params里（key, value）形式，如下：
          * result_action            回调第三方应用时的anction(String,必须)
          * file_path                视频文件绝对路径(String, 必须 现阶段支持file:// ,content:// 协议文件路径)
-         * title                    视频标题(String,必须)
-         * description              视频说明(String,必须)
+         * title                    视频标题(String,必须) 最多80字 超过80字，sdk截取77个字符并在文字结尾加"..."
+         * description              视频说明(String,必须) 最多2000字 超过2000字，sdk截取1997个字符并在文字结尾加"..."
          * topicName               带的话题(String,非必须)
          */
         bundle.putString("result_action", "com.youku.opensdk.DEMO");

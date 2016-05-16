@@ -8,8 +8,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 
 import com.youku.opensdk.YoukuAPIAuthCallback;
@@ -157,7 +155,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
         Intent intent = new Intent();
         intent.setAction(Constants.OPEN_API_ACTION_UPLOAD);
         intent.setPackage(mYoukuPackageName);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtras(params);
         mContext.startActivity(intent);
         return true;
@@ -203,6 +201,20 @@ public class ApiFirstVersion implements YoukuOpenAPI {
         }
         if (!params.containsKey("caller_app_name")) {
             params.putString("caller_app_name", Utils.getAppName(mContext));
+        }
+        if (params.containsKey("title")) {
+            String title = params.getString("title");
+            if (!TextUtils.isEmpty(title) &&
+                    title.length() > Constants.VIDEO_TITLE_TEXT_MAX) {
+                params.putString("title", Utils.adjustLongString(title, Constants.VIDEO_TITLE_TEXT_MAX));
+            }
+        }
+        if (params.containsKey("description")) {
+            String desc = params.getString("description");
+            if (!TextUtils.isEmpty(desc) &&
+                    desc.length() > Constants.VIDEO_DESC_TEXT_MAX) {
+                params.putString("description", Utils.adjustLongString(desc, Constants.VIDEO_DESC_TEXT_MAX));
+            }
         }
     }
 

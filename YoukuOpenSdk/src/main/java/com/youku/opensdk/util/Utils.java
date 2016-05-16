@@ -10,6 +10,8 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -110,4 +112,20 @@ public class Utils {
         return "";
     }
 
+    public static String adjustLongString(String str, int maxLen) {
+        if (TextUtils.isEmpty(str)) {
+            return "";
+        }
+
+        int len = str.length();
+        if (len <= maxLen) {
+            return str;
+        }
+
+        int fillCharLen = Constants.FILL_CHARACTER.length();
+        if (maxLen <= fillCharLen)
+            return str.substring(0, maxLen);
+
+        return str.substring(0, maxLen - fillCharLen) + Constants.FILL_CHARACTER;
+    }
 }
