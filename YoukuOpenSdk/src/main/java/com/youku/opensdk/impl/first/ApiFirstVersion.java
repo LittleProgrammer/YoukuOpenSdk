@@ -43,7 +43,7 @@ public class ApiFirstVersion implements YoukuOpenAPI {
     ApiFirstVersion(Context context) {
         mContext = context;
         if (queryYoukuAppFromPM(mContext)) {
-            startYoukuEmptyActivity(mContext);
+//            startYoukuEmptyActivity(mContext);
         }
         queryYoukuApp(mContext);
     }
